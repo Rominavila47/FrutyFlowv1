@@ -3,6 +3,7 @@ package com.frutyflow.frutyflowv1.controller;
 import com.frutyflow.frutyflowv1.model.*;
 import com.frutyflow.frutyflowv1.repository.*;
 import org.apache.catalina.filters.ExpiresFilter;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
@@ -89,14 +90,53 @@ public class MainController {
     public @ResponseBody
     Iterable<Producto> getallproductos (){ return productoRepositorio.findAll(); }
 
-    @PostMapping(path = "producto/crear", consumes = "application/json", produces = "application/json")
-    public Producto crearProducto (@RequestBody Producto nuevoProducto) {
-        return productoRepositorio.save(nuevoProducto);}
+    @PostMapping(path = "usuario/{idusuario}/producto/crear", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<GeneralResponse> crearProducto (@PathVariable ("idusuario")String idusuario, @RequestBody Producto nuevoProducto){
+        GeneralResponse response = new GeneralResponse();
+        try{
+            Collection<Rol> rolesPorUsuario = rolRepositorio.getRolesPorUsuario(idusuario);
+            for (Rol r : rolesPorUsuario) {
+                if (r.getNombre().equals("ADMINISTRADOR")) {
+                    productoRepositorio.save(nuevoProducto);
+                    response.setCodigo(HttpStatus.OK.value());
+                    response.setMensaje("El Producto = " + nuevoProducto.getNombre() + " fue creado");
+                    return ResponseEntity.ok(response);
+                }
+            }
+            response.setCodigo(HttpStatus.UNAUTHORIZED.value());
+            response.setMensaje("Usuario no autorizado para esta función");
+            return ResponseEntity.ok(response);
 
-    @PutMapping (path = "producto/actualizar")
-    public Producto actualizarProducto (@RequestBody Producto actualizarProducto){
-        return productoRepositorio.save(actualizarProducto);}
+        }catch (Exception e){
+            response.setCodigo(HttpStatus.CONFLICT.value());
+            response.setMensaje(HttpStatus.CONFLICT.getReasonPhrase() + " - " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
 
+    @PutMapping (path = "usuario/{idusuario}/producto/actualizar")
+    public ResponseEntity<GeneralResponse> actualizarProducto (@PathVariable ("idusuario")String idusuario, @RequestBody Producto actualizarProducto){
+        GeneralResponse response = new GeneralResponse();
+        try{
+            Collection<Rol> rolesPorUsuario = rolRepositorio.getRolesPorUsuario(idusuario);
+            for (Rol r : rolesPorUsuario) {
+                if (r.getNombre().equals("ADMINISTRADOR")) {
+                    productoRepositorio.save(actualizarProducto);
+                    response.setCodigo(HttpStatus.OK.value());
+                    response.setMensaje("El Producto = " + actualizarProducto.getNombre() + " fue actualizado");
+                    return ResponseEntity.ok(response);
+                }
+            }
+            response.setCodigo(HttpStatus.UNAUTHORIZED.value());
+            response.setMensaje("Usuario no autorizado para esta función");
+            return ResponseEntity.ok(response);
+
+        }catch (Exception e){
+            response.setCodigo(HttpStatus.CONFLICT.value());
+            response.setMensaje(HttpStatus.CONFLICT.getReasonPhrase() + " - " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
 
     @DeleteMapping(path = "usuario/{idusuario}/producto/eliminar/{idproducto}")
     public @ResponseBody
@@ -159,17 +199,82 @@ public class MainController {
 
     }
 
-    //INVENTARIO
-
     //PROVEEDOR
     @GetMapping (path = "proveedor/all")
     public @ResponseBody
-    Iterable<Proveedor> getallproveedores (){
+    Iterable<Proveedor> getAllProveedores (){
         return proveedorRepositorio.findAll();
     }
 
+    @GetMapping (path = "proveedor/{idproveedor}")
+    public @ResponseBody
+    Optional<Proveedor> getProveedorPorId (@PathVariable ("idproveedor") int idproveedor){
+        return proveedorRepositorio.findById(idproveedor);}
 
-    //RECETA
+    @PostMapping (path = "usuario/{idusuario}/proveedor/crear")
+    public ResponseEntity<GeneralResponse> crearProveedor (@PathVariable ("idusuario")String idusuario, @RequestBody Proveedor crearProveedor){
+        GeneralResponse response = new GeneralResponse();
+        try{
+            Collection<Rol> rolesPorUsuario = rolRepositorio.getRolesPorUsuario(idusuario);
+            for (Rol r : rolesPorUsuario) {
+                if (r.getNombre().equals("ADMINISTRADOR") || r.getNombre().equals("EMPLEADO")) {
+                    proveedorRepositorio.save(crearProveedor);
+                    response.setCodigo(HttpStatus.OK.value());
+                    response.setMensaje("El Proveedor = " + crearProveedor.getNombre() + " fue creado");
+                    return ResponseEntity.ok(response);
+                }
+            }
+            response.setCodigo(HttpStatus.UNAUTHORIZED.value());
+            response.setMensaje("Usuario no autorizado para esta función");
+            return ResponseEntity.ok(response);
+
+        }catch (Exception e){
+            response.setCodigo(HttpStatus.CONFLICT.value());
+            response.setMensaje(HttpStatus.CONFLICT.getReasonPhrase() + " - " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @PutMapping (path = "usuario/{idusuario}/proveedor/actualizar")
+    public ResponseEntity<GeneralResponse> actualizarProveedor (@PathVariable ("idusuario")String idusuario, @RequestBody Proveedor actualizarProveedor){
+        GeneralResponse response = new GeneralResponse();
+        try{
+            Collection<Rol> rolesPorUsuario = rolRepositorio.getRolesPorUsuario(idusuario);
+            for (Rol r : rolesPorUsuario) {
+                if (r.getNombre().equals("ADMINISTRADOR") || r.getNombre().equals("EMPLEADO")) {
+                    proveedorRepositorio.save(actualizarProveedor);
+                    response.setCodigo(HttpStatus.OK.value());
+                    response.setMensaje("El Proveedor = " + actualizarProveedor.getNombre() + " fue actualizado");
+                    return ResponseEntity.ok(response);
+                }
+            }
+            response.setCodigo(HttpStatus.UNAUTHORIZED.value());
+            response.setMensaje("Usuario no autorizado para esta función");
+            return ResponseEntity.ok(response);
+
+        }catch (Exception e){
+            response.setCodigo(HttpStatus.CONFLICT.value());
+            response.setMensaje(HttpStatus.CONFLICT.getReasonPhrase() + " - " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+    @DeleteMapping(path = "usuario/{idusuario}/proveedor/eliminar/{idproveedor}")
+    public @ResponseBody
+    String eliminarProveedorPorId (@PathVariable ("idusuario")String idusuario,
+                                @PathVariable ("idproveedor")int idproveedor){
+        Collection<Rol> rolesPorUsuario = rolRepositorio.getRolesPorUsuario(idusuario);
+        for (Rol r : rolesPorUsuario) {
+            if (r.getNombre().equals("ADMINISTRADOR")) {
+                proveedorRepositorio.deleteById(idproveedor);
+                return "La Receta con id = " + idproveedor + " fue eliminado";
+            }
+        }
+        return "Usuario no autorizado para esta función";
+    }
+    //INVENTARIO
+
+
+    // RECETA
     @DeleteMapping(path = "usuario/{idusuario}/receta/eliminar/{idreceta}")
     public @ResponseBody
     String eliminarRecetaPorId (@PathVariable ("idusuario")String idusuario,
