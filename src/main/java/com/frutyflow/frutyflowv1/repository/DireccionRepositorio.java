@@ -9,7 +9,7 @@ import java.util.Collection;
 
 public interface DireccionRepositorio extends CrudRepository<Direccion, Integer> {
 
-    @Query (value = "select d.* from direccion as d inner join usuario as u " +
+    @Query (value = "select d.* from Direccion as d inner join Usuario as u " +
             "on d.idusuario = u.idusuario where d.idusuario = :idusuario", nativeQuery = true)
     Collection <Direccion> getDireccionesPorUsuario (@Param("idusuario") String idusuario);
 

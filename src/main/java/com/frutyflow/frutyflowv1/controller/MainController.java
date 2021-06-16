@@ -49,9 +49,8 @@ public class MainController {
     //DIRECCION
     @GetMapping (path = "direccion/usuario/{idusuario}")
     public @ResponseBody
-    Collection<Direccion> getallDireccionesPorUsuario (@PathVariable ("idusuario") String idusuario){
-        return direccionRepositorio.getDireccionesPorUsuario(idusuario);
-    }
+    Collection<Direccion> getAllDireccionesPorUsuario (@PathVariable ("idusuario") String idusuario){
+        return direccionRepositorio.getDireccionesPorUsuario(idusuario); }
 
     @DeleteMapping(path = "direccion/eliminar/{iddireccion}")
     public @ResponseBody
@@ -62,15 +61,19 @@ public class MainController {
     //Roles
     @GetMapping (path = "roles/all/usuario/{idusuario}")
     public @ResponseBody
-    Collection<Rol> getallRolesPorUsuario (@PathVariable ("idusuario") String idusuario){
-        return rolRepositorio.getRolesPorUsuario(idusuario);
-    }
+    Collection<Rol> getAllRolesPorUsuario (@PathVariable ("idusuario") String idusuario){
+        return rolRepositorio.getRolesPorUsuario(idusuario); }
+
     // USUARIO
     @GetMapping (path = "usuario/all")
     public @ResponseBody
-    Iterable<Usuario> getallusuarios (){
-        return usuarioRepositorio.findAll();
-    }
+    Iterable<Usuario> getAllUsuarios (){return usuarioRepositorio.findAll(); }
+
+    @GetMapping (path = "usuario/{idusuario}")
+    public @ResponseBody
+    Optional<Usuario> getUsuarioPorId (@PathVariable ("idusuario") int idusuario){
+        return usuarioRepositorio.findById(idusuario);}
+
     @PostMapping(path = "usuario/crear", consumes = "application/json", produces = "application/json")
     public Usuario crearUsuario (@RequestBody Usuario nuevoUsuario) {
         return usuarioRepositorio.save(nuevoUsuario);}
@@ -90,8 +93,14 @@ public class MainController {
     public @ResponseBody
     Iterable<Producto> getallproductos (){ return productoRepositorio.findAll(); }
 
+    @GetMapping (path = "producto/{nombre}")
+    public @ResponseBody
+    Iterable<Producto>getProductoPorNombre(@PathVariable("nombre") String nombre){
+        return productoRepositorio.getProductoPorNombre(nombre); }
+
     @PostMapping(path = "usuario/{idusuario}/producto/crear", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<GeneralResponse> crearProducto (@PathVariable ("idusuario")String idusuario, @RequestBody Producto nuevoProducto){
+    public ResponseEntity<GeneralResponse> crearProducto (@PathVariable ("idusuario")String idusuario,
+                                                          @RequestBody Producto nuevoProducto){
         GeneralResponse response = new GeneralResponse();
         try{
             Collection<Rol> rolesPorUsuario = rolRepositorio.getRolesPorUsuario(idusuario);
@@ -155,22 +164,20 @@ public class MainController {
     //FACTURA
     @GetMapping (path = "factura/all")
     public @ResponseBody
-    Iterable<Factura> getallfacturas (){
-        return facturaRepositorio.findAll();
-    }
+    Iterable<Factura> getAllFacturas (){ return facturaRepositorio.findAll(); }
 
     @GetMapping (path = "factura/{idfactura}")
     public @ResponseBody
-    Optional<Factura> getfacturaById (@PathVariable ("idfactura") int idfactura){
+    Optional<Factura> getFacturaPorId (@PathVariable ("idfactura") int idfactura){
         return facturaRepositorio.findById(idfactura);}
 
     @PostMapping(path = "factura/create", consumes = "application/json", produces = "application/json")
-    public Factura createfactura (@RequestBody Factura newfactura) {
-        return facturaRepositorio.save(newfactura);}
+    public Factura createFactura (@RequestBody Factura newFactura) {
+        return facturaRepositorio.save(newFactura);}
 
     @PutMapping (path = "factura/update")
-    public Factura updatefactura (@RequestBody Factura updatefactura){
-        return facturaRepositorio.save(updatefactura);}
+    public Factura actualizarFactura (@RequestBody Factura actualizarFactura){
+        return facturaRepositorio.save(actualizarFactura);}
 
     @DeleteMapping(path = "usuario/{idusuario}/factura/eliminar/{idfactura}")
     public @ResponseBody
@@ -196,20 +203,24 @@ public class MainController {
             response.setMensaje(HttpStatus.CONFLICT.getReasonPhrase() + " - " + e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }
-
     }
 
     //PROVEEDOR
     @GetMapping (path = "proveedor/all")
     public @ResponseBody
     Iterable<Proveedor> getAllProveedores (){
-        return proveedorRepositorio.findAll();
-    }
+        return proveedorRepositorio.findAll(); }
 
     @GetMapping (path = "proveedor/{idproveedor}")
     public @ResponseBody
     Optional<Proveedor> getProveedorPorId (@PathVariable ("idproveedor") int idproveedor){
         return proveedorRepositorio.findById(idproveedor);}
+
+    @GetMapping (path = "proveedor/nombre/{nombre}")
+    public @ResponseBody
+    Iterable<Proveedor>getProveedorPorNombre(@PathVariable("nombre") String nombre){
+        return proveedorRepositorio.getProveedorPorNombre(nombre); }
+
 
     @PostMapping (path = "usuario/{idusuario}/proveedor/crear")
     public ResponseEntity<GeneralResponse> crearProveedor (@PathVariable ("idusuario")String idusuario, @RequestBody Proveedor crearProveedor){
@@ -266,11 +277,12 @@ public class MainController {
         for (Rol r : rolesPorUsuario) {
             if (r.getNombre().equals("ADMINISTRADOR")) {
                 proveedorRepositorio.deleteById(idproveedor);
-                return "La Receta con id = " + idproveedor + " fue eliminado";
+                return "El Proveedor con id = " + idproveedor + " fue eliminado";
             }
         }
         return "Usuario no autorizado para esta función";
     }
+
     //INVENTARIO
 
 

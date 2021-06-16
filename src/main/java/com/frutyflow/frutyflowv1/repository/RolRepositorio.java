@@ -9,7 +9,7 @@ import java.util.Collection;
 
 public interface RolRepositorio extends CrudRepository<Rol, Integer> {
 
-    @Query(value = "select r.*, u.idusuario from rol as r " +
-            "inner join usuario as u on r.idrol = u.idrol where u.idusuario = :idusuario", nativeQuery = true)
+    @Query(value = "select r.*, u.idusuario from Rol as r " +
+            "inner join Usuario as u on r.idrol = u.idrol where u.idusuario = :idusuario", nativeQuery = true)
     Collection<Rol> getRolesPorUsuario (@Param("idusuario") String idusuario);
 }
