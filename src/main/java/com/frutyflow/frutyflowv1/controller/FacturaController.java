@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -29,14 +30,24 @@ public class FacturaController {
 
     @GetMapping (path = "factura/{idfactura}")
     public @ResponseBody
-    Optional<Factura> getFacturaPorId (@PathVariable ("idfactura") int idfactura){
-        return facturaRepositorio.findById(idfactura);}
+    Iterable<Factura> getFacturaPorId (@PathVariable ("idfactura") int idfactura){
+        return facturaRepositorio.getFacturaPorId(idfactura);}
 
-    @PostMapping(path = "factura/create", consumes = "application/json", produces = "application/json")
-    public Factura createFactura (@RequestBody Factura newFactura) {
+    @GetMapping (path = "factura/total/{total}")
+    public @ResponseBody
+    Iterable<Factura> getFacturaPorTotal (@PathVariable ("total") String total){
+        return facturaRepositorio.getFacturaPorTotal(total);}
+
+    @GetMapping (path = "factura/fecha/{fecha}")
+    public @ResponseBody
+    Iterable<Factura> getFacturaPorFecha (@PathVariable ("fecha") Date fecha){
+        return facturaRepositorio.getFacturaPorFecha(fecha);}
+
+    @PostMapping(path = "factura/crear", consumes = "application/json", produces = "application/json")
+    public Factura crearFactura (@RequestBody Factura newFactura) {
         return facturaRepositorio.save(newFactura);}
 
-    @PutMapping (path = "factura/update")
+    @PutMapping (path = "factura/actualizar")
     public Factura actualizarFactura (@RequestBody Factura actualizarFactura){
         return facturaRepositorio.save(actualizarFactura);}
 

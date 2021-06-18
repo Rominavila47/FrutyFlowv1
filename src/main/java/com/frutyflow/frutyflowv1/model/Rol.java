@@ -15,7 +15,7 @@ public class Rol {
     private String nombre;
 
     @JsonManagedReference
-    @ManyToMany(fetch=FetchType.EAGER)
+    @ManyToMany(fetch=FetchType.LAZY)
     @JoinTable (name = "recursos_rol", joinColumns = @JoinColumn(name = "idrol"),
             inverseJoinColumns = @JoinColumn (name = "idrecurso"))
     private Set<Recurso> recurso_rol;

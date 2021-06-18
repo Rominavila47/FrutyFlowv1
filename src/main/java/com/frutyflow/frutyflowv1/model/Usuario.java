@@ -1,9 +1,13 @@
 package com.frutyflow.frutyflowv1.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@JsonIgnoreProperties(value = {"crearUsuario", "actualizarUsuario"},
+        allowGetters = true)
 public class Usuario {
 
     @Id
@@ -24,7 +28,7 @@ public class Usuario {
 
     private String contraseña;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn (name = "idrol", referencedColumnName = "idrol")
     private Rol rol;
 
